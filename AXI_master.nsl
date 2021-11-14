@@ -1,0 +1,7 @@
+// clock/reset name is changed.
+// ACLK, ARESETn
+
+#include "AXI_master.nsh"
+
+module AXI_master {
+}
