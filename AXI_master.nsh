@@ -1,5 +1,5 @@
 declare AXI_master interface {
-    // AXI signals
+    // AXI4-Lite signals
     // Global signals
     input ACLK;
     input ARESETn;

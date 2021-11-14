@@ -4,4 +4,25 @@
 #include "AXI_master.nsh"
 
 module AXI_master {
+    reg arvalid = 1;
+    reg awalid = 1;
+    reg wvalid = 1;
+
+    func_self handshake_wa();
+    func_self handshake_w();
+    func_self handshake_wr();
+    func_self handshake_ra();
+    func_self handshake_rr();
+
+    ARVALID := arvalid;
+    AWVALID := arvalid;
+    WVALID := wvalid;
+
+    func write {
+
+    }
+
+    func read {
+
+    }
 }
