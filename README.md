@@ -1,3 +1,3 @@
-# AXI Interface
+# AXI4-Lite Interface
 
-This repository has AXI interfaces. For example, AXI master interface and AXI slave interface.
+This repository has AXI4-Lite interfaces. For example, master and slave interfaces.
