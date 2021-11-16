@@ -1,4 +1,4 @@
-// CLK(ACLK) RST(ARESETn)
+// CLK(ACLK) RST(ARESETn) NEGRST
 
 #include "AXI_master.nsh"
 
@@ -12,6 +12,8 @@ module AXI_master {
 
     reg bready = 0b0;
     reg bresp[2] = 0b00;
+
+    label_name WAIT_READY, WAIT_BVALID, FINISH;
 
     AWVALID = awvalid;
     AWADDR = awaddr;
@@ -36,9 +38,7 @@ module AXI_master {
             bready := 1;
         }
 
-        while (~AWREADY & ~WREADY) {
-            ;
-        }
+WAIT_READY:
         if (AWREADY & WREADY) {
             awvalid := 0;
             wvalid := 0;
@@ -46,16 +46,23 @@ module AXI_master {
             awaddr := 0;
             wdata_r := 0;
             wstrb := 0;
+
+            goto WAIT_BVALID;
+        } else {
+            goto WAIT_READY;
         }
 
-        while (~BVALID) {
-            ;
-        }
+WAIT_BVALID:
         if (BVALID) {
             bresp := BRESP;
             bready := ~bready;
+
+            goto FINISH;
+        } else {
+            goto WAIT_BVALID;
         }
 
+FINISH:
         finish_w(bresp);
     }
 

@@ -1,0 +1,56 @@
+// CLK(ACLK) RST(ARESETn) NEGRST
+
+#include "AXI_slave.nsh"
+
+module AXI_slave {
+    reg awready = 0b0;
+    reg wready = 0b0;
+    reg awaddr[32] = 0x00000000;
+    reg wdata_r[64] = 0x0000000000000000;
+    reg wstrb[2] = 0b00;
+    reg bvalid = 0b0;
+    reg bresp[2] = 0b00;
+
+    reg prev_awvalid = 0b0;
+    reg prev_wvalid = 0b0;
+
+    func_self write();
+
+    AWREADY = awready;
+    WREADY = wready;
+    BVALID = bvalid;
+    BRESP = bresp;
+
+    prev_awvalid := AWVALID;
+    prev_wvalid := WVALID;
+
+    if ((~prev_awvalid & AWVALID) & (~prev_wvalid & WVALID)) {
+        write();
+    }
+
+    func write seq {
+        {
+            if (AWVALID & WVALID) {
+                awaddr := AWADDR;
+                awready := 0b1;
+
+                wdata_r := WDATA;
+                wready := 0b1;
+            }
+        }
+
+        {
+            awready := 0b0;
+            wready := 0b0;
+        }
+
+        while (~BREADY) {
+            ;
+        }
+        if (BREADY) {
+            bvalid := 0b1;
+            bresp := 0b00;
+        }
+        bvalid := 0b0;
+    }
+}

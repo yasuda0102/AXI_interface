@@ -1,4 +1,4 @@
-// CLK(ACLK) RST(ARESETn) SIM
+// CLK(ACLK) RST(ARESETn) NEGRST SIM
 
 #include "AXI_master.nsh"
 
@@ -8,11 +8,36 @@ declare AXI_master_test simulation {
 module AXI_master_test {
     AXI_master m0;
 
+    reg awready = 0b0;
+    reg wready = 0b0;
+    reg bresp[2] = 0b00;
+    reg bvalid = 0b0;
+
     m0.ACLK = ACLK;
     m0.ARESETn = ARESETn;
+    m0.AWREADY = awready;
+    m0.WREADY = wready;
+    m0.BRESP = bresp;
+    m0.BVALID = bvalid;
 
     _init {
         m0.write(0xcafebabe, 0xcafebabecafebabe, 0xff);
+
+        if (m0.AWVALID) {
+            awready := 0b1;
+            wready := 0b1;
+        }
+
+        {
+            awready := 0b0;
+            wready := 0b0;
+        }
+
+        if (m0.BREADY) {
+            bvalid := 0b1;
+        }
+
+        bvalid := 0b0;
     }
 
     func m0.finish_w {

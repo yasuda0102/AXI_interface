@@ -1,0 +1,66 @@
+// CLK(ACLK) RST(ARESETn) NEGRST SIM
+
+#include "AXI_slave.nsh"
+
+declare AXI_slave_test simulation {
+}
+
+module AXI_slave_test {
+    AXI_slave s0;
+
+    reg awvalid = 0b0;
+    reg awaddr[32] = 0x00000000;
+    reg awprot[3] = 0b000;
+    reg wvalid = 0b0;
+    reg wdata[64] = 0x0000000000000000;
+    reg wstrb[8] = 0x00;
+    reg bready = 0b0;
+
+    label_name BEFORE, AFTER, AFTER2;
+
+    s0.ACLK = ACLK;
+    s0.ARESETn = ARESETn;
+    s0.AWVALID = awvalid;
+    s0.AWADDR = awaddr;
+    s0.AWPROT = awprot;
+    s0.WVALID = wvalid;
+    s0.WDATA = wdata;
+    s0.WSTRB = wstrb;
+    s0.BREADY = bready;
+
+    _init {
+        {
+            awvalid := 0b1;
+            wvalid := 0b1;
+            bready := 0b1;
+            awaddr := 0xcafebabe;
+            wdata := 0xcafebabecafebabe;
+            wstrb := 0xff;
+        }
+
+BEFORE:
+        {
+            if (s0.AWREADY & s0.WREADY) {
+                awvalid := 0b0;
+                wvalid := 0b0;
+
+                awaddr := 0x00000000;
+                wdata := 0x0000000000000000;
+                wstrb := 0x00;
+
+                goto AFTER;
+            } else {
+                goto BEFORE;
+            }
+        }
+
+AFTER:
+        if (s0.BVALID) {
+            bready := 0b0;
+        } else {
+            goto AFTER;
+        }
+
+        _finish;
+    }
+}
