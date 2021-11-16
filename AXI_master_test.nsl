@@ -1,0 +1,21 @@
+// CLK(ACLK) RST(ARESETn) SIM
+
+#include "AXI_master.nsh"
+
+declare AXI_master_test simulation {
+}
+
+module AXI_master_test {
+    AXI_master m0;
+
+    m0.ACLK = ACLK;
+    m0.ARESETn = ARESETn;
+
+    _init {
+        m0.write(0xcafebabe, 0xcafebabecafebabe, 0xff);
+    }
+
+    func m0.finish_w {
+        _finish;
+    }
+}

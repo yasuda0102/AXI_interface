@@ -47,7 +47,7 @@ declare AXI_master interface {
     input waddr[32];
     input wdata[64];
     input wstrobe[8];
-    output wstatus;
+    output wstatus[2];
 
     func_in write(waddr, wdata, wstrobe);
     func_out finish_w(wstatus);

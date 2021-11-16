@@ -1,25 +1,62 @@
-// clock/reset name is changed.
-// ACLK, ARESETn
+// CLK(ACLK) RST(ARESETn)
 
 #include "AXI_master.nsh"
 
 module AXI_master {
-    reg arvalid = 1;
-    reg awalid = 1;
-    reg wvalid = 1;
+    reg awvalid = 0b0;
+    reg awaddr[32] = 0x00000000;
 
-    func_self handshake_wa();
-    func_self handshake_w();
-    func_self handshake_wr();
-    func_self handshake_ra();
-    func_self handshake_rr();
+    reg wvalid = 0b0;
+    reg wdata_r[64] = 0x0000000000000000;
+    reg wstrb[8] = 0xff;
 
-    ARVALID := arvalid;
-    AWVALID := arvalid;
-    WVALID := wvalid;
+    reg bready = 0b0;
+    reg bresp[2] = 0b00;
 
-    func write {
+    AWVALID = awvalid;
+    AWADDR = awaddr;
 
+    WVALID = wvalid;
+    WDATA = wdata_r;
+
+    WSTRB = wstrb;
+
+    BREADY = bready;
+
+    func write seq {
+        {
+            awvalid := 1;
+            awaddr := waddr;
+
+            wvalid := 1;
+            wdata_r := wdata;
+
+            wstrb := wstrobe;
+
+            bready := 1;
+        }
+
+        while (~AWREADY & ~WREADY) {
+            ;
+        }
+        if (AWREADY & WREADY) {
+            awvalid := 0;
+            wvalid := 0;
+
+            awaddr := 0;
+            wdata_r := 0;
+            wstrb := 0;
+        }
+
+        while (~BVALID) {
+            ;
+        }
+        if (BVALID) {
+            bresp := BRESP;
+            bready := ~bready;
+        }
+
+        finish_w(bresp);
     }
 
     func read {
