@@ -6,8 +6,5 @@ do
     rm -f $FILE
 done
 
-# vcdファイルの削除
-rm -f *.vcd
-
 # シミュレーション実行ファイルの削除
 rm -f a.out

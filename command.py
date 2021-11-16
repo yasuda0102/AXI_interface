@@ -17,11 +17,13 @@ command = string2[0].split(" ")
 
 matching_list = [
     r"(.*)\((.*)\)",
-    r"(SIM)"
+    r"(SIM)",
+    r"(NEGRST)"
 ]
 
 clock = ""
 reset = ""
+negrst = ""
 simulation = ""
 
 for x in command:
@@ -35,5 +37,8 @@ for x in command:
             elif match.groups()[0] == "SIM":
                 basename = re.sub(r"(.*)\.nsl", r"\1", filename)
                 simulation = f"-target {basename} -verisim2"
+            elif match.groups()[0] == "NEGRST":
+                negrst = "-neg_res"
 
-print(f"nsl2vl {filename} {clock} {reset} {simulation}")
+
+print(f"nsl2vl {filename} {clock} {reset} {negrst} {simulation}")
